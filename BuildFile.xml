@@ -6,6 +6,22 @@
 <use name="DataFormats/PatCandidates"/>
 <use name="FWCore/Framework"/>
 <use name="FWCore/ParameterSet"/>
+<use name="CommonTools/CandUtils"/>
+<use name="MagneticField/Engine"/>
+<use name="MagneticField/Records"/>
+<use name="TrackingTools/TransientTrack"/>
+<use name="RecoParticleFlow/PFClusterTools" />
+<use name="PhysicsTools/KinFitter"/>
+<use name="TrackingTools/Records"/>
+<use name="RecoVertex/KinematicFit"/>
+<use name="root"/>
+<use name="roofit"/>
+
+
+<use name="CLHEP"/>
+
+<use name="rootrflx"/>
+
 <export>
   <lib name="1"/>
 </export>
