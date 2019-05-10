@@ -1,3 +1,0 @@
-T1_IT_CNAF_Buffer
-T1_IT_CNAF_MSS
-T2_US_Purdue
