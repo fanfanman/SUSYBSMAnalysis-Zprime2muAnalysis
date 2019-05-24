@@ -789,9 +789,9 @@ double Zprime2muHistosFromPAT::getSmearedMass(const pat::CompositeCandidate& dil
 
     }
     double res = a + b*gM + c*gM*gM + d*pow(gM,3) + e*pow(gM,4);
-
+	
     double extraSmear = res*0.15;
-
+    
 	
     TRandom3 *rand = new TRandom3(0);
     double result = mass*rand->Gaus(1,extraSmear);
