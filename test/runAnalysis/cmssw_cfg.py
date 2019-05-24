@@ -12,10 +12,10 @@ process.source.fileNames =[
 
 
 process.maxEvents.input = -1
-isMC = False
+isMC = True
 addNTuples = False
 year = 2017
-process.GlobalTag.globaltag = '94X_dataRun2_ReReco_EOY17_v6'
+process.GlobalTag.globaltag = '94X_mc2017_realistic_v14'
 process.options.wantSummary = cms.untracked.bool(True)# false di default
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000 # default 1000
 
