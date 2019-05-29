@@ -34,7 +34,7 @@ class ResolutionUsingMC : public edm::EDAnalyzer {
   void fillLeptonHistos(const edm::View<reco::Candidate>&);
   void fillLeptonHistosFromDileptons(const pat::CompositeCandidateCollection&);
   void fillDileptonHistos(const pat::CompositeCandidateCollection&);
-  //void fillDileptonResEventByEvent(const reco::CompositeCandidate&);
+  void fillDileptonResEventByEvent(const reco::CompositeCandidate&);
   double getSmearedMass(const reco::CompositeCandidate& dil);
 
   HardInteraction hardInteraction;
@@ -121,10 +121,10 @@ class ResolutionUsingMC : public edm::EDAnalyzer {
   TProfile* ResonanceMassResVMass;
   TProfile* DileptonInvMassResVMass;
 
-//  TH2F* DileptonResEventByEventVsMass_2d_BB;
-//  TH2F* DileptonResEventByEventVsMass_2d_BE;
-//  TH2F* DileptonResEventByEventRelVsMass_2d_BB;
-//  TH2F* DileptonResEventByEventRelVsMass_2d_BE;
+  TH2F* DileptonResEventByEventVsRecMass_2d_BB;
+  TH2F* DileptonResEventByEventVsRecMass_2d_BE;
+  TH2F* DileptonResEventByEventVsGenMass_2d_BB;
+  TH2F* DileptonResEventByEventVsGenMass_2d_BE;
   
 //  TH1F* DileptonMassResBy[W_D_MAX];
 //  TH1F* DileptonResMassResBy[W_D_MAX];
@@ -241,10 +241,10 @@ ResolutionUsingMC::ResolutionUsingMC(const edm::ParameterSet& cfg)
   ResonanceMassResVMass   = fs->make<TProfile>("ResonanceMassResVMass",   titlePrefix + "(res. mass - gen res. mass)/(gen res. mass)", nbinsmass,0, massmax, -1, 1);
   DileptonInvMassResVMass = fs->make<TProfile>("DileptonInvMassResVMass", titlePrefix + "(./dil. mass - 1/gen dil. mass)/(1/gen dil. mass)", nbinsmass,0, massmax, -1, 1);
 
-//  DileptonResEventByEventVsMass_2d_BB = fs->make<TH2F>("DileptonResEventByEventVsMass_2d_BB", titlePrefix + "res event by event", 120, 0., 6000., 1000, 0., 10.0);
-//  DileptonResEventByEventVsMass_2d_BE = fs->make<TH2F>("DileptonResEventByEventVsMass_2d_BE", titlePrefix + "res ebe in be", 120, 0., 6000., 1000, 0., 10.0);
-//  DileptonResEventByEventRelVsMass_2d_BB = fs->make<TH2F>("DileptonResEventByEventRelVsMass_2d_BB", titlePrefix + "rel res in bb", 120, 0., 6000., 1000, 0., 0.3);
-//  DileptonResEventByEventRelVsMass_2d_BE = fs->make<TH2F>("DileptonResEventByEventRelVsMass_2d_BE", titlePrefix + "rel res in be", 120, 0., 6000., 1000, 0., 0.3);
+  DileptonResEventByEventVsRecMass_2d_BB = fs->make<TH2F>("DileptonResEventByEventVsRecMass_2d_BB", titlePrefix + "res event by event", 120, 0., 6000., 1000, 0., 0.5);
+  DileptonResEventByEventVsRecMass_2d_BE = fs->make<TH2F>("DileptonResEventByEventVsRecMass_2d_BE", titlePrefix + "res ebe in be", 120, 0., 6000., 1000, 0., 0.5);
+  DileptonResEventByEventVsGenMass_2d_BB = fs->make<TH2F>("DileptonResEventByEventVsGenMass_2d_BB", titlePrefix + "rel res in bb", 120, 0., 6000., 1000, 0., 0.5);
+  DileptonResEventByEventVsGenMass_2d_BE = fs->make<TH2F>("DileptonResEventByEventVsGenMass_2d_BE", titlePrefix + "rel res in be", 120, 0., 6000., 1000, 0., 0.5);
 
 
   weights = fs->make<TH1F>("weights","weights",90,1,4);
@@ -484,7 +484,7 @@ void ResolutionUsingMC::fillChargeResolution(const reco::GenParticle* gen_lep, c
     ChargeWrongVInvPt->Fill(1/gen_lep->pt());
 }
 
-/*void ResolutionUsingMC::fillDileptonResEventByEvent(const reco::CompositeCandidate& dil) {
+void ResolutionUsingMC::fillDileptonResEventByEvent(const reco::CompositeCandidate& dil) {
   
   //pat::Muon* mu1 = dil.daughter(0);
   //pat::Muon* mu2 = dil.daughter(1)
@@ -498,20 +498,21 @@ void ResolutionUsingMC::fillChargeResolution(const reco::GenParticle* gen_lep, c
 
   CompositeCandMassResolution *res = new CompositeCandMassResolution();
   double mass_res = res->getMassResolution(mumu);
+  double rec_mass = dil.mass();
   //std::cout << "EventByEvent Res = " << mass_res << std::endl;
 
   if (!hardInteraction.IsValidForRes()) return;
   const double gen_mass = (hardInteraction.lepPlusNoIB->p4() + hardInteraction.lepMinusNoIB->p4()).mass();
   //std::cout << "res  / gen_mass = " << mass_res/gen_mass << std::endl;
 
-  if (dil.daughter(0)->eta()<=1.2 && dil.daughter(1)->eta()<=1.2 && dil.daughter(0)->eta()>=-1.2 && dil.daughter(1)->eta()>=-1.2) {
-    DileptonResEventByEventVsMass_2d_BB->Fill(gen_mass, mass_res);
-    DileptonResEventByEventRelVsMass_2d_BB->Fill(gen_mass, mass_res/gen_mass);
+  if (fabs(dil.daughter(0)->eta())<=1.2 && fabs(dil.daughter(1)->eta())<=1.2 ) {
+    DileptonResEventByEventVsRecMass_2d_BB->Fill(rec_mass, mass_res/rec_mass/2.0);
+    DileptonResEventByEventVsGenMass_2d_BB->Fill(gen_mass, mass_res/gen_mass/2.0);
   } else {
-    DileptonResEventByEventVsMass_2d_BE->Fill(gen_mass, mass_res);
-    DileptonResEventByEventRelVsMass_2d_BE->Fill(gen_mass, mass_res/gen_mass);
+    DileptonResEventByEventVsRecMass_2d_BE->Fill(rec_mass, mass_res/rec_mass/2.0);
+    DileptonResEventByEventVsGenMass_2d_BE->Fill(gen_mass, mass_res/gen_mass/2.0);
   }
-}*/
+}
 
 void ResolutionUsingMC::fillDileptonMassResolution(const reco::CompositeCandidate& dil) {
   if (!hardInteraction.IsValidForRes())
@@ -601,7 +602,7 @@ void ResolutionUsingMC::fillLeptonHistosFromDileptons(const pat::CompositeCandid
 void ResolutionUsingMC::fillDileptonHistos(const pat::CompositeCandidateCollection& dileptons) {
   for (pat::CompositeCandidateCollection::const_iterator dil = dileptons.begin(), dile = dileptons.end(); dil != dile; ++dil) {
     fillDileptonMassResolution(*dil);
-    //fillDileptonResEventByEvent(*dil);
+    fillDileptonResEventByEvent(*dil);
   }
 }
 
@@ -635,7 +636,7 @@ double ResolutionUsingMC::getSmearedMass(const reco::CompositeCandidate& dil){
 
     double mass = dil.mass();
     double extraSmear = 0.0;
-    if (fabs(dil.daughter(0)->eta()) < 1.2 && fabs(dil.daughter(1)->eta()) < 1.2) { extraSmear = 0.00595 + 3.43E-05 * mass - 1.3E-08 * pow(mass,2.0) + 2.11E-12 * pow(mass, 3.0) - 1.0E-16 * pow(mass, 4.0);}
+    if (fabs(dil.daughter(0)->eta()) < 1.2 && fabs(dil.daughter(1)->eta()) < 1.2) { return mass; }
     else { extraSmear = 0.0113 + 3.09E-05 * mass - 1.03E-08 * pow(mass, 2.0) + 1.7E-12 * pow(mass, 3.0) - 1E-16 * pow(mass, 4.0); }
     double realSmear = sqrt((extraSmear*1.15)*(extraSmear*1.15) - extraSmear*extraSmear);
 
