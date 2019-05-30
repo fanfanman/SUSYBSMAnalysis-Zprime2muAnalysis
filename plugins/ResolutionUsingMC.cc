@@ -121,10 +121,10 @@ class ResolutionUsingMC : public edm::EDAnalyzer {
   TProfile* ResonanceMassResVMass;
   TProfile* DileptonInvMassResVMass;
 
-  TH2F* DileptonResEventByEventVsRecMass_2d_BB;
-  TH2F* DileptonResEventByEventVsRecMass_2d_BE;
-  TH2F* DileptonResEventByEventVsGenMass_2d_BB;
-  TH2F* DileptonResEventByEventVsGenMass_2d_BE;
+  TH2F* DileptonResEventByEventVsMass_2d_BB;
+  TH2F* DileptonResEventByEventVsMass_2d_BE;
+  TH2F* DileptonResEventByEventRelVsMass_2d_BB;
+  TH2F* DileptonResEventByEventRelVsMass_2d_BE;
   
 //  TH1F* DileptonMassResBy[W_D_MAX];
 //  TH1F* DileptonResMassResBy[W_D_MAX];
@@ -241,10 +241,10 @@ ResolutionUsingMC::ResolutionUsingMC(const edm::ParameterSet& cfg)
   ResonanceMassResVMass   = fs->make<TProfile>("ResonanceMassResVMass",   titlePrefix + "(res. mass - gen res. mass)/(gen res. mass)", nbinsmass,0, massmax, -1, 1);
   DileptonInvMassResVMass = fs->make<TProfile>("DileptonInvMassResVMass", titlePrefix + "(./dil. mass - 1/gen dil. mass)/(1/gen dil. mass)", nbinsmass,0, massmax, -1, 1);
 
-  DileptonResEventByEventVsRecMass_2d_BB = fs->make<TH2F>("DileptonResEventByEventVsRecMass_2d_BB", titlePrefix + "res event by event", 120, 0., 6000., 1000, 0., 0.5);
-  DileptonResEventByEventVsRecMass_2d_BE = fs->make<TH2F>("DileptonResEventByEventVsRecMass_2d_BE", titlePrefix + "res ebe in be", 120, 0., 6000., 1000, 0., 0.5);
-  DileptonResEventByEventVsGenMass_2d_BB = fs->make<TH2F>("DileptonResEventByEventVsGenMass_2d_BB", titlePrefix + "rel res in bb", 120, 0., 6000., 1000, 0., 0.5);
-  DileptonResEventByEventVsGenMass_2d_BE = fs->make<TH2F>("DileptonResEventByEventVsGenMass_2d_BE", titlePrefix + "rel res in be", 120, 0., 6000., 1000, 0., 0.5);
+  DileptonResEventByEventVsMass_2d_BB = fs->make<TH2F>("DileptonResEventByEventVsMass_2d_BB", titlePrefix + "res ebe in bb", 120, 0., 6000., 1000, 0., 1000.0);
+  DileptonResEventByEventVsMass_2d_BE = fs->make<TH2F>("DileptonResEventByEventVsMass_2d_BE", titlePrefix + "res ebe in be", 120, 0., 6000., 1000, 0., 1000.0);
+  DileptonResEventByEventRelVsMass_2d_BB = fs->make<TH2F>("DileptonResEventByEventRelVsMass_2d_BB", titlePrefix + "rel res in bb", 120, 0., 6000., 2000, 0., 1.0);
+  DileptonResEventByEventRelVsMass_2d_BE = fs->make<TH2F>("DileptonResEventByEventRelVsMass_2d_BE", titlePrefix + "rel res in be", 120, 0., 6000., 2000, 0., 1.0);
 
 
   weights = fs->make<TH1F>("weights","weights",90,1,4);
@@ -498,7 +498,7 @@ void ResolutionUsingMC::fillDileptonResEventByEvent(const reco::CompositeCandida
 
   CompositeCandMassResolution *res = new CompositeCandMassResolution();
   double mass_res = res->getMassResolution(mumu);
-  double rec_mass = dil.mass();
+  //double rec_mass = dil.mass();
   //std::cout << "EventByEvent Res = " << mass_res << std::endl;
 
   if (!hardInteraction.IsValidForRes()) return;
@@ -506,11 +506,11 @@ void ResolutionUsingMC::fillDileptonResEventByEvent(const reco::CompositeCandida
   //std::cout << "res  / gen_mass = " << mass_res/gen_mass << std::endl;
 
   if (fabs(dil.daughter(0)->eta())<=1.2 && fabs(dil.daughter(1)->eta())<=1.2 ) {
-    DileptonResEventByEventVsRecMass_2d_BB->Fill(rec_mass, mass_res/rec_mass/2.0);
-    DileptonResEventByEventVsGenMass_2d_BB->Fill(gen_mass, mass_res/gen_mass/2.0);
+    DileptonResEventByEventVsMass_2d_BB->Fill(gen_mass, mass_res);
+    DileptonResEventByEventRelVsMass_2d_BB->Fill(gen_mass, mass_res/gen_mass);
   } else {
-    DileptonResEventByEventVsRecMass_2d_BE->Fill(rec_mass, mass_res/rec_mass/2.0);
-    DileptonResEventByEventVsGenMass_2d_BE->Fill(gen_mass, mass_res/gen_mass/2.0);
+    DileptonResEventByEventVsMass_2d_BE->Fill(gen_mass, mass_res);
+    DileptonResEventByEventRelVsMass_2d_BE->Fill(gen_mass, mass_res/gen_mass);
   }
 }
 

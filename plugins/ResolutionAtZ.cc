@@ -63,8 +63,8 @@ class ResolutionAtZ : public edm::EDAnalyzer {
   TH2F* DileptonMass_2d_vsPt_BB_neweta;
   TH2F* DileptonMass_2d_vsPt_BE_neweta;
 
-  TH2F* DileptonResEventByEventRelVsMass_2d_BB;
-  TH2F* DileptonResEventByEventRelVsMass_2d_BE;
+  TH2F* DileptonResEventByEventVsPt_2d_BB;
+  TH2F* DileptonResEventByEventVsPt_2d_BE;
   TH2F* DileptonResEventByEventRelVsPt_2d_BB;
   TH2F* DileptonResEventByEventRelVsPt_2d_BE;
 
@@ -115,10 +115,10 @@ ResolutionAtZ::ResolutionAtZ(const edm::ParameterSet& cfg)
    DileptonMass_2d_vsPt_BB_neweta = fs->make<TH2F>("DileptonMass_2d_vsPt_BB_neweta", titlePrefix + " dil. mass vs pt", 200, 50., 150., 2000., 0., 2000.);
    DileptonMass_2d_vsPt_BE_neweta = fs->make<TH2F>("DileptonMass_2d_vsPt_BE_neweta", titlePrefix + " dil. mass vs pt", 200, 50., 150., 2000., 0., 2000.);
 
-  DileptonResEventByEventRelVsMass_2d_BB = fs->make<TH2F>("DileptonResEventByEventRelVsMass_2d_BB", titlePrefix + "res ebe in bb", 120, 0., 6000., 1000, 0., 0.5);
-  DileptonResEventByEventRelVsMass_2d_BE = fs->make<TH2F>("DileptonResEventByEventRelVsMass_2d_BE", titlePrefix + "res ebe in be", 120, 0., 6000., 1000, 0., 0.5);
-  DileptonResEventByEventRelVsPt_2d_BB = fs->make<TH2F>("DileptonResEventByEventRelVsPt_2d_BB", titlePrefix + "rel res in bb", 2000, 0., 2000., 1000, 0., 0.5);
-  DileptonResEventByEventRelVsPt_2d_BE = fs->make<TH2F>("DileptonResEventByEventRelVsPt_2d_BE", titlePrefix + "rel res in be", 2000, 0., 2000., 1000, 0., 0.5);
+  DileptonResEventByEventVsPt_2d_BB = fs->make<TH2F>("DileptonResEventByEventVsPt_2d_BB", titlePrefix + "res ebe in bb", 2000, 0., 2000., 1000, 0., 1000.0);
+  DileptonResEventByEventVsPt_2d_BE = fs->make<TH2F>("DileptonResEventByEventVsPt_2d_BE", titlePrefix + "res ebe in be", 2000, 0., 2000., 1000, 0., 1000.0);
+  DileptonResEventByEventRelVsPt_2d_BB = fs->make<TH2F>("DileptonResEventByEventRelVsPt_2d_BB", titlePrefix + "rel res in bb", 2000, 0., 2000., 1000, 0., 1.0);
+  DileptonResEventByEventRelVsPt_2d_BE = fs->make<TH2F>("DileptonResEventByEventRelVsPt_2d_BE", titlePrefix + "rel res in be", 2000, 0., 2000., 1000, 0., 1.0);
 
 
 }
@@ -244,13 +244,15 @@ void ResolutionAtZ::fillDileptonResEventByEvent(const reco::CompositeCandidate& 
   // std::cout << "res  / gen_mass = " << mass_res/gen_mass << std::endl;
   
   if (mass < 105 && mass > 75 && fabs(dil.daughter(0)->eta())<=1.2 && fabs(dil.daughter(1)->eta())<=1.2) {
-    DileptonResEventByEventRelVsPt_2d_BB->Fill(dil.daughter(0)->pt(), mass_res/mass/2.0);
-    DileptonResEventByEventRelVsPt_2d_BB->Fill(dil.daughter(1)->pt(), mass_res/mass/2.0);
-    DileptonResEventByEventRelVsMass_2d_BB->Fill(mass, mass_res/mass/2.0);
+    DileptonResEventByEventRelVsPt_2d_BB->Fill(dil.daughter(0)->pt(), mass_res/mass);
+    DileptonResEventByEventRelVsPt_2d_BB->Fill(dil.daughter(1)->pt(), mass_res/mass);
+    DileptonResEventByEventVsPt_2d_BB->Fill(dil.daughter(0)->pt(), mass_res);
+    DileptonResEventByEventVsPt_2d_BB->Fill(dil.daughter(1)->pt(), mass_res);
   } else if (mass < 105 && mass > 75) {
-    DileptonResEventByEventRelVsPt_2d_BE->Fill(dil.daughter(0)->pt(), mass_res/mass/2.0);
-    DileptonResEventByEventRelVsPt_2d_BE->Fill(dil.daughter(1)->pt(), mass_res/mass/2.0);
-    DileptonResEventByEventRelVsMass_2d_BE->Fill(mass, mass_res/mass/2.0);
+    DileptonResEventByEventRelVsPt_2d_BE->Fill(dil.daughter(0)->pt(), mass_res/mass);
+    DileptonResEventByEventRelVsPt_2d_BE->Fill(dil.daughter(1)->pt(), mass_res/mass);
+    DileptonResEventByEventVsPt_2d_BE->Fill(dil.daughter(0)->pt(), mass_res);
+    DileptonResEventByEventVsPt_2d_BE->Fill(dil.daughter(1)->pt(), mass_res);
   }
 }
 
