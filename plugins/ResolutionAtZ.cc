@@ -243,11 +243,11 @@ void ResolutionAtZ::fillDileptonResEventByEvent(const reco::CompositeCandidate& 
   //const double gen_mass = (hardInteraction.lepPlusNoIB->p4() + hardInteraction.lepMinusNoIB->p4()).mass();
   // std::cout << "res  / gen_mass = " << mass_res/gen_mass << std::endl;
   
-  if (fabs(dil.daughter(0)->eta())<=1.2 && fabs(dil.daughter(1)->eta())<=1.2) {
+  if (mass < 105 && mass > 75 && fabs(dil.daughter(0)->eta())<=1.2 && fabs(dil.daughter(1)->eta())<=1.2) {
     DileptonResEventByEventRelVsPt_2d_BB->Fill(dil.daughter(0)->pt(), mass_res/mass/2.0);
     DileptonResEventByEventRelVsPt_2d_BB->Fill(dil.daughter(1)->pt(), mass_res/mass/2.0);
     DileptonResEventByEventRelVsMass_2d_BB->Fill(mass, mass_res/mass/2.0);
-  } else {
+  } else if (mass < 105 && mass > 75) {
     DileptonResEventByEventRelVsPt_2d_BE->Fill(dil.daughter(0)->pt(), mass_res/mass/2.0);
     DileptonResEventByEventRelVsPt_2d_BE->Fill(dil.daughter(1)->pt(), mass_res/mass/2.0);
     DileptonResEventByEventRelVsMass_2d_BE->Fill(mass, mass_res/mass/2.0);
